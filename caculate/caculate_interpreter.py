@@ -20,19 +20,24 @@ class Expr(object):
     # return the result of a Expr
     @property
     def result(self):
-        self.num_list = [self.generate_result(sym) for sym in self.num_list]
-        if self.operator in ("add", "+"):
-            return reduce(lambda x,y: x+y, self.num_list)
-        elif self.operator in ("sub", "-"):
-            return reduce(lambda x,y: x-y, self.num_list)
-        elif self.operator in ("mul", "*"):
-            return reduce(lambda x,y: x*y, self.num_list)
-        elif self.operator in ("div", "/"):
-            try:
-                return reduce(lambda x,y: x/y, self.num_list)
-            except ZeroDivisionError:
-                print("Error:除数不能为0!\n")
-                exit(0)
+        try:
+            self.num_list = [self.generate_result(sym) for sym in self.num_list]
+            if self.operator in ("add", "+"):
+                return reduce(lambda x,y: x+y, self.num_list)
+            elif self.operator in ("sub", "-"):
+                return reduce(lambda x,y: x-y, self.num_list)
+            elif self.operator in ("mul", "*"):
+                return reduce(lambda x,y: x*y, self.num_list)
+            elif self.operator in ("div", "/"):
+                try:
+                    return reduce(lambda x,y: x/y, self.num_list)
+                except ZeroDivisionError:
+                    print("Error:除数不能为0!\n")
+                    return
+        except:
+            print("Caculate Error!")
+            return
+
 
     def generate_result(self, sym):
         if(isinstance(sym, Expr)):
@@ -43,9 +48,8 @@ class Expr(object):
 
 
 class Interpreter(object):
-    def __init__(self, text=None, symbols=[]):
+    def __init__(self, text=None):
         self.text = text
-        self.symbols = symbols
         self.tokens = []
 
     def parse(self):
@@ -97,8 +101,21 @@ class Interpreter(object):
         raise Exception("index is error!")
 
 
+def repl():
+    print("Caculate version 1.0\n")
+    prompt = ">>> "
+    i = Interpreter()
+    while(True):
+        try:
+            i.text = input(prompt)
+            i.tokenize()
+            expr = i.parse()
+            print("parser result: {}".format(expr))
+            print("Caculate result: {}".format(expr.result))
+        except InterruptedError:
+            print("Caculate Interpreter end!")
+            return None
 
-i = Interpreter("add(1.5, sub(2,div(1,1)), mul(2,3))")
-i.tokenize()
-expr = i.parse()
-print(expr.result)
+
+if __name__ == "__main__":
+    repl()
